@@ -1,0 +1,28 @@
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+
+# Go build and test artifacts
+**/bin/
+**/obj/
+**/tmp/
+**/node_modules/
+**/coverage.out
+**/coverage.html
+**/*.test
+
+# Local source data is excluded from version control.
+predictor/domain/data/*.csv
+
+# Local environment and secrets
+.env
+.env.*
+
+# Docker and local tooling
+.docker/
+docker-data/

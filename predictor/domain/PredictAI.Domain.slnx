@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PredictAI.Domain.Api/PredictAI.Domain.Api.csproj" />
+    <Project Path="src/PredictAI.Domain.Core/PredictAI.Domain.Core.csproj" />
+    <Project Path="src/PredictAI.Domain.Infrastructure/PredictAI.Domain.Infrastructure.csproj" />
+    <Project Path="src/PredictAI.Domain.Worker/PredictAI.Domain.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PredictAI.Domain.Tests/PredictAI.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
