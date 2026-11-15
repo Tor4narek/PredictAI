@@ -1,9 +1,9 @@
-# Fact-to-company contract
+# Контракт связи факта с компанией
 
-- company_id: company scope for this chat and profile lookup.
-- news_id: identifier used to fetch facts when they are not supplied in the call body.
-- fact_id: existing ClickHouse fact identifier; never synthesize one.
-- relevance: concise explanation of why the fact refers to the company.
-- confidence: JSON number from 0 to 1 expressing confidence in the link. Do not quote it; use `0.85`, not `"0.85"`.
+- `company_id` — идентификатор компании, к которой относится чат и профиль.
+- `news_id` — идентификатор для получения фактов, если они не переданы в теле вызова.
+- `fact_id` — существующий идентификатор факта в ClickHouse; никогда не создавай его самостоятельно.
+- `relevance` — краткое объяснение, почему факт относится к компании.
+- `confidence` — число JSON от 0 до 1, показывающее уверенность в связи. Не заключай его в кавычки: передавай `0.85`, а не `"0.85"`.
 
-Fact-company links are stored separately from universal facts. The link does not change the underlying fact.
+Связи фактов с компаниями хранятся отдельно от общих фактов. Создание связи не изменяет сам факт.

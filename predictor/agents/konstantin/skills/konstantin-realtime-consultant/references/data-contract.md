@@ -1,12 +1,12 @@
-# Konstantin data contract
+# Контракт данных Константина
 
-The ESB sends `company_id`, a request kind, and the request or analysis identifiers to Hermes. The ESB stores the finished response and evidence in its PostgreSQL chat history before making the message available on `/stream`.
+ESB передаёт Hermes `company_id`, тип запроса и идентификаторы запроса или анализа. Перед отправкой сообщения в `/stream` ESB сохраняет готовый ответ и доказательства в историю чата PostgreSQL.
 
-Use `get_consultant_context` for company-linked facts and pre-aggregated metric observations and totals from ClickHouse. Each fact and observation includes `source_id`, `source_url`, and `material_kind`. Copy the exact `source_id` UUID into the final evidence field named `sourceId`; do not use `news_id` or `fact_id` as a substitute. The company profile is Markdown in S3 and metric definitions are structured PostgreSQL settings, both read through ESB MCP.
+Для фактов о компании, агрегированных наблюдений метрик и итогов из ClickHouse используй `get_consultant_context`. Каждая запись факта и наблюдения содержит `source_id`, `source_url` и `material_kind`. Без изменений скопируй UUID `source_id` в итоговое поле `sourceId`; не подменяй его на `news_id` или `fact_id`. Профиль компании хранится в S3 в формате Markdown, а определения метрик — в PostgreSQL. Оба источника доступны через MCP ESB.
 
-Output JSON fields:
+Поля выходного JSON:
 
-- `text`: complete user-facing answer.
-- `evidence`: unique `{ "sourceId": "...", "originKind": "fact|publisher_analysis|ai_inference" }` entries.
+- `text` — полный ответ пользователю.
+- `evidence` — уникальные записи `{ "sourceId": "...", "originKind": "fact|publisher_analysis|ai_inference" }`.
 
-Use `fact` for external news, `publisher_analysis` for publisher research materials, and `ai_inference` for a clearly identified inference. No date range is mandatory.
+Используй `fact` для внешних новостей, `publisher_analysis` для исследовательских материалов издателей и `ai_inference` для явно обозначенного вывода. Указывать диапазон дат необязательно.

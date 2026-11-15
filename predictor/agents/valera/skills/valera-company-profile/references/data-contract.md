@@ -1,21 +1,21 @@
-# Company profile and metric contract
+# Контракт профиля компании и метрик
 
-The company profile is Markdown at `companies/{company_id}/profile.md` in S3. It is generated from the extensible JSON profile supplied by Domain. ESB is the only component that accesses S3, PostgreSQL, and ClickHouse.
+Профиль компании хранится в S3 по адресу `companies/{company_id}/profile.md`. Он создаётся на основе расширяемого JSON-профиля, который передаёт Domain. Только ESB обращается к S3, PostgreSQL и ClickHouse.
 
-## Metric settings
+## Настройки метрик
 
-PostgreSQL is the source of truth for company-specific metric settings. Each row stores a database-generated opaque `metric_id`, `company_id`, `type_code`, `name`, `description`, `metric_type`, `characteristic`, `unit`, and structured `parameters`.
+PostgreSQL — источник истины для настроек метрик компании. Каждая строка хранит созданный базой непрозрачный `metric_id`, а также `company_id`, `type_code`, `name`, `description`, `metric_type`, `characteristic`, `unit` и структурированные `parameters`.
 
-At most one row per `(company_id, type_code)` is stored. `metric_type` must match the PostgreSQL `company_metric_type` enum. Use a stable descriptive `type_code` for each measurable business indicator, a concise unit when applicable, and `parameters.source_fields` to list the exact profile keys that justify the setting. Do not include field values in `parameters`. The profile may contain any application-defined fields, so derive indicators only from data actually supplied. Do not create placeholder rows.
+Для пары `(company_id, type_code)` допускается не более одной строки. `metric_type` должен соответствовать перечислению PostgreSQL `company_metric_type`. Для каждого измеримого показателя используй устойчивый описательный `type_code`, краткую единицу измерения при необходимости и перечисли в `parameters.source_fields` точные ключи профиля, на которых основана настройка. Не помещай значения полей в `parameters`. Профиль может содержать произвольные поля приложения, поэтому создавай показатели только на основании фактически переданных данных. Не добавляй строки-заглушки.
 
-## Profile save and retry
+## Сохранение профиля и повторы
 
-`profile_revision` is a positive, monotonically increasing revision supplied by Domain. `save_company_profile_and_metrics` takes the complete Markdown profile and complete metric snapshot for that revision. ESB replaces the company's metric settings in PostgreSQL, then writes the stable S3 profile key. Omitted metric rows are removed; an empty array removes all rows. An older revision cannot overwrite newer data. Repeating the same revision and payload is idempotent, including repair after a partial S3 failure.
+`profile_revision` — положительная монотонно растущая версия, которую передаёт Domain. `save_company_profile_and_metrics` принимает полный текст профиля Markdown и полный снимок метрик этой версии. ESB заменяет настройки метрик компании в PostgreSQL, затем записывает профиль по постоянному ключу в S3. Отсутствующие в снимке строки метрик удаляются; пустой массив удаляет все строки. Старая версия не может перезаписать новые данные. Повтор той же версии и содержимого идемпотентен и позволяет исправить частичный сбой записи в S3.
 
-On a transient failure, retry once with the exact same company ID, revision, Markdown, and metric settings. Do not invent IDs or increment the revision for a retry.
+При временном сбое повтори запрос один раз, точно сохранив ID компании, версию, Markdown и настройки метрик. Не придумывай идентификаторы и не увеличивай версию при повторе.
 
-## Analytics boundary
+## Граница аналитики
 
-ClickHouse stores news, company-independent facts, fact-to-company links, observations, and generated analyses. An observation references a database-generated `metric_id`; it is opaque and must not encode company or metric data. News owns publication time, URL, and material kind used by analytics. Totals are calculated when requested and are not persisted.
+ClickHouse хранит новости, общие факты, связи фактов с компаниями, наблюдения и созданные аналитические материалы. Наблюдение ссылается на созданный базой `metric_id`; он непрозрачен и не должен кодировать компанию или тип метрики. Время публикации, URL и тип материала принадлежат новости и используются аналитикой. Итоги вычисляются по запросу и не сохраняются.
 
-The Domain request to `POST /call?agent=valera` uses `companyId`, `profileRevision`, and `company`. ESB normalizes it before invoking Hermes as `company_id`, `company_data`, and `profile_revision`.
+Запрос Domain к `POST /call?agent=valera` содержит `companyId`, `profileRevision` и `company`. Перед вызовом Hermes ESB преобразует их в `company_id`, `company_data` и `profile_revision`.

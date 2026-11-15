@@ -1,23 +1,23 @@
 # PredictAI
 
-PredictAI is a backend platform for company-focused news intelligence. It collects materials from configured public sources, extracts article text, builds structured facts, and lets an AI consultant answer questions using cited evidence and company context.
+PredictAI — серверная платформа для анализа новостей и деловой информации о компаниях. Она собирает материалы из заданных открытых источников, извлекает текст, выделяет структурированные факты и помогает ИИ-консультанту отвечать на вопросы с опорой на источники и профиль компании.
 
-## Architecture
+## Архитектура
 
-- **Domain API (.NET 10)** provides registration, JWT authentication, company profiles, source management, one-time material links, and chat endpoints.
-- **Domain Worker (.NET 10)** polls RSS, Atom, sitemap, and HTML sources, parses HTML and text-based PDF materials, and submits extracted text to the integration layer.
-- **ESB (Go)** manages asynchronous agent calls, chat history, retries, data access, and WebSocket streams between the API and AI runtime.
-- **Hermes agents** process company profiles, extract facts from materials, calculate metrics, and provide the conversational interface.
-- **PostgreSQL** stores users, company profile JSON, source metadata, call state, and conversation data. **ClickHouse** stores news facts and analytics. **S3-compatible storage** stores generated company context.
+- **Domain API (.NET 10)** отвечает за регистрацию и вход пользователей, JWT-аутентификацию, профиль компании, управление источниками, разовые ссылки на материалы и чат.
+- **Domain Worker (.NET 10)** опрашивает RSS-, Atom-, sitemap- и HTML-источники, извлекает содержимое HTML-страниц и текстовых PDF и передаёт его в интеграционный слой.
+- **ESB (Go)** управляет асинхронными вызовами агентов, историей чатов, повторами, доступом к данным и WebSocket-потоками между API и средой запуска ИИ.
+- **Агенты Hermes** обрабатывают профили компаний, извлекают факты из материалов, рассчитывают метрики и отвечают пользователям в чате.
+- **PostgreSQL** хранит пользователей, JSON-профили компаний, метаданные источников, состояние вызовов и историю переписки. **ClickHouse** хранит факты и аналитические данные. **S3-совместимое хранилище** содержит сформированный контекст компании.
 
-The company profile is an extensible JSON object. PredictAI does not require a fixed external company dataset.
+Профиль компании — расширяемый JSON-объект. Для работы платформы не требуется фиксированный внешний набор данных о компаниях.
 
-## Run locally
+## Локальный запуск
 
-Requirements: Docker Compose, .NET 10 SDK, Go 1.24, and an API key for the configured LLM provider.
+Требования: Docker Compose, .NET 10 SDK, Go 1.24 и ключ API выбранного поставщика языковой модели.
 
-1. Copy `.env.example` to `.env` and replace the development credentials with local values.
-2. Start the databases and object storage, then apply their initial migrations:
+1. Скопируйте `.env.example` в `.env` и замените демонстрационные значения локальными параметрами.
+2. Запустите базы данных и объектное хранилище, затем примените начальные миграции:
 
    ```sh
    docker compose --env-file .env up -d postgres domain-postgres clickhouse minio
@@ -25,21 +25,21 @@ Requirements: Docker Compose, .NET 10 SDK, Go 1.24, and an API key for the confi
    docker compose --env-file .env --profile migrations run --rm atlas-clickhouse
    ```
 
-3. Start the full backend:
+3. Запустите серверную часть приложения:
 
    ```sh
    docker compose --env-file .env up --build
    ```
 
-The Domain API listens on `http://localhost:8080`; Swagger is available locally at `/swagger`. Database containers and the API bind to loopback by default. Configure model names and provider credentials in `.env` before starting the agent services.
+Domain API доступен по адресу `http://localhost:8080`, Swagger UI — по пути `/swagger`. По умолчанию API и базы данных привязаны только к локальному интерфейсу. Перед запуском агентов укажите в `.env` модели и ключи доступа к поставщику.
 
-## Documentation
+## Документация
 
-- [System architecture](predictor/docs/architecture.md)
-- [Domain API and worker](predictor/domain/README.md)
-- [ESB integration contract](predictor/docs/esb-contracts.md)
-- [HTTP, WebSocket, and MCP API references](predictor/docs/api/README.md)
-- [Configuration reference](predictor/docs/configuration.md)
-- [Development and operations](predictor/docs/development.md)
+- [Архитектура системы](predictor/docs/architecture.md)
+- [Domain API и фоновый обработчик](predictor/domain/README.md)
+- [Контракт интеграции с ESB](predictor/docs/esb-contracts.md)
+- [Справочники HTTP, WebSocket и MCP API](predictor/docs/api/README.md)
+- [Настройки приложения](predictor/docs/configuration.md)
+- [Разработка и эксплуатация](predictor/docs/development.md)
 
-API descriptions in `predictor/docs/api/` are generated from the Go implementation. Regenerate them with `make docs` after changing the ESB contract.
+Описание API в `predictor/docs/api/` генерируется из реализации на Go. После изменения контрактов ESB обновите документы командой `make docs`.

@@ -5,17 +5,17 @@
 
 | Инструмент | Назначение |
 | --- | --- |
-| `calculate_all_metric_totals` | Read a company's metric rows and units from PostgreSQL, recalculate each from ClickHouse observations, persist the resulting analytical snapshots in ClickHouse, and return the catalog-ordered results. |
-| `calculate_metric_total` | Recalculate one metric from ClickHouse observations for an inclusive news-time range and persist the resulting analytical snapshot in ClickHouse. Metric ownership and its returned unit are read from PostgreSQL settings. |
-| `get_company_facts` | Read universal facts that have already been linked to a company. Limit accepts an integer or numeric string. |
-| `get_company_metrics` | Read the company's structured metric settings from PostgreSQL through the ESB. Limit accepts an integer or numeric string. |
-| `get_company_profile` | Read the company's Markdown profile from S3 through the ESB. |
-| `get_company_report` | Read a company report containing linked facts, configured metrics, totals and analyses. |
-| `get_consultant_context` | Read linked facts and observations from ClickHouse and recalculate configured company metric totals through ESB. Results include source IDs; totals use news publication times across stored history. Limit accepts an integer or numeric string. |
-| `get_facts` | Read universal facts for a news_id from ClickHouse. Limit accepts an integer or numeric string. |
-| `save_company_analysis` | Persist a probability-based analysis. Probability accepts a JSON number or numeric string; ESB normalizes numeric strings. |
-| `save_company_metrics` | Idempotently upsert structured metric settings for a company in PostgreSQL through the ESB. |
-| `save_company_profile_and_metrics` | Idempotently save the company Markdown profile to S3 and upsert its structured metric settings in PostgreSQL through the ESB. |
-| `save_fact_company_links` | Persist Savely's supported links between universal facts and a company. |
-| `save_metric_observations` | Store metric observations linked to news and facts. Values and probabilities accept JSON numbers or numeric strings; ESB normalizes numeric strings. Use null for unknown values. Period bounds are not stored on observations. ESB derives a stable observation ID from company, metric, news, and source fact IDs; supply a distinct observation_id when separate predictions share the same fact IDs. |
-| `save_news_and_facts` | Store submitted news and company-independent facts in ClickHouse. Copy news_id, source_id, and news_text exactly from the current call. Copy optional metadata only when supplied; never invent company_id, source_url, or timestamps. An empty facts array is valid. occurred_at must be RFC3339 with an explicit timezone or null. ESB normalizes empty or non-RFC3339 values to null because the event time is unknown or ambiguous. Confidence accepts a JSON number or numeric string. |
+| `calculate_all_metric_totals` | Читает настройки и единицы измерения метрик компании из PostgreSQL, пересчитывает каждую метрику по наблюдениям ClickHouse, сохраняет аналитические снимки в ClickHouse и возвращает результаты в порядке каталога. |
+| `calculate_metric_total` | Пересчитывает метрику по наблюдениям ClickHouse для включительного диапазона времени публикации новостей и сохраняет снимок результата в ClickHouse. Принадлежность метрики компании и единица измерения берутся из настроек PostgreSQL. |
+| `get_company_facts` | Читает общие факты, уже связанные с компанией. Параметр limit принимает целое число или числовую строку. |
+| `get_company_metrics` | Читает структурированные настройки метрик компании из PostgreSQL через ESB. Параметр limit принимает целое число или числовую строку. |
+| `get_company_profile` | Читает профиль компании в формате Markdown из S3 через ESB. |
+| `get_company_report` | Читает отчёт компании со связанными фактами, настроенными метриками, итогами расчётов и анализами. |
+| `get_consultant_context` | Читает связанные факты и наблюдения из ClickHouse, а через ESB пересчитывает итоги настроенных метрик компании. Ответ содержит ID источников; итоги используют время публикации новостей за всю сохранённую историю. Параметр limit принимает целое число или числовую строку. |
+| `get_facts` | Читает общие факты для news_id из ClickHouse. Параметр limit принимает целое число или числовую строку. |
+| `save_company_analysis` | Сохраняет анализ компании с оценками вероятности. Вероятность передаётся числом JSON или числовой строкой; ESB преобразует строку в число. |
+| `save_company_metrics` | Идемпотентно обновляет структурированные настройки метрик компании в PostgreSQL через ESB. |
+| `save_company_profile_and_metrics` | Идемпотентно сохраняет профиль компании в формате Markdown в S3 и обновляет её структурированные настройки метрик в PostgreSQL через ESB. |
+| `save_fact_company_links` | Сохраняет подтверждённые Савелием связи общих фактов с компанией. |
+| `save_metric_observations` | Сохраняет наблюдения метрик, связанные с новостями и фактами. Значения и вероятности передаются числами JSON или числовыми строками; ESB преобразует строки в числа. Для неизвестных значений используйте null. Границы периода у наблюдений не хранятся. ESB формирует стабильный ID из компании, метрики, новости и исходных фактов; если разные прогнозы используют одни и те же ID фактов, передайте разные observation_id. |
+| `save_news_and_facts` | Сохраняет новость и не привязанные к компании факты в ClickHouse. Точно скопируйте news_id, source_id и news_text из текущего вызова. Передавайте необязательные метаданные только при их наличии; не придумывайте company_id, source_url или временные отметки. Пустой список facts допустим. occurred_at должен быть RFC3339 с явным часовым поясом или null. ESB приводит пустые и некорректные значения к null, поскольку время события неизвестно или неоднозначно. Confidence передаётся числом JSON или числовой строкой. |

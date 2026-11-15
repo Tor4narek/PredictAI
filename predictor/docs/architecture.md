@@ -6,9 +6,9 @@ ESB — единственная граница между агентами, Dom
 
 ```mermaid
 flowchart LR
-    Domain[Domain service] -->|HTTP /call| ESB
+    Domain[Сервис Domain] -->|HTTP /call| ESB
     Domain <-->|WebSocket /stream — только Константин| ESB
-    ESB -->|запуск агента| Hermes[Hermes runtime]
+    ESB -->|запуск агента| Hermes[Среда Hermes]
     Hermes -->|статус выполнения| ESB
     Hermes -->|MCP| ESB
     ESB --> PG[(PostgreSQL)]
@@ -16,9 +16,9 @@ flowchart LR
     ESB --> S3[(S3 / MinIO)]
 ```
 
-Hermes не подключается напрямую к PostgreSQL, ClickHouse или S3 и не получает их credentials. Агенты читают и изменяют данные через инструменты MCP ESB. Отдельного profiles/S3-сервиса нет.
+Hermes не подключается напрямую к PostgreSQL, ClickHouse или S3 и не получает учётные данные хранилищ. Агенты читают и изменяют данные через инструменты MCP ESB. Отдельного сервиса профилей/S3 нет.
 
-Compose запускает ESB после хранилищ и ожидает его healthcheck до старта Hermes, чтобы MCP endpoint был доступен при подключении агентов.
+Compose запускает ESB после хранилищ и ждёт успешной проверки его состояния до старта Hermes, чтобы MCP endpoint был доступен при подключении агентов.
 
 ## Границы доверия
 

@@ -1,4 +1,4 @@
-# Документация Predictor
+# Документация PredictAI
 
 - [Архитектура](architecture.md)
 - [Интеграция Domain и ESB](integration.md)

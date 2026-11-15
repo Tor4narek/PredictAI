@@ -11,7 +11,7 @@ import (
 )
 
 func registerMetricTools(server *mcp.Server, allowed map[string]struct{}, service *analytics.Service) {
-	addTool(server, allowed, &mcp.Tool{Name: "save_metric_observations", Description: "Store metric observations linked to news and facts. Values and probabilities accept JSON numbers or numeric strings; ESB normalizes numeric strings. Use null for unknown values. Period bounds are not stored on observations. ESB derives a stable observation ID from company, metric, news, and source fact IDs; supply a distinct observation_id when separate predictions share the same fact IDs."}, func(ctx context.Context, _ *mcp.CallToolRequest, input metricObservationsInput) (*mcp.CallToolResult, insertedOutput, error) {
+	addTool(server, allowed, &mcp.Tool{Name: "save_metric_observations", Description: "Сохраняет наблюдения метрик, связанные с новостями и фактами. Значения и вероятности передаются числами JSON или числовыми строками; ESB преобразует строки в числа. Для неизвестных значений используйте null. Границы периода у наблюдений не хранятся. ESB формирует стабильный ID из компании, метрики, новости и исходных фактов; если разные прогнозы используют одни и те же ID фактов, передайте разные observation_id."}, func(ctx context.Context, _ *mcp.CallToolRequest, input metricObservationsInput) (*mcp.CallToolResult, insertedOutput, error) {
 		observations := make([]domain.MetricObservation, 0, len(input.Observations))
 		for i, observation := range input.Observations {
 			if observation.CompanyID != "" && !strings.EqualFold(strings.TrimSpace(observation.CompanyID), strings.TrimSpace(input.CompanyID)) {
@@ -43,7 +43,7 @@ func registerMetricTools(server *mcp.Server, allowed map[string]struct{}, servic
 		return nil, insertedOutput{Inserted: len(observations)}, nil
 	})
 
-	addTool(server, allowed, &mcp.Tool{Name: "calculate_metric_total", Description: "Recalculate one metric from ClickHouse observations for an inclusive news-time range and persist the resulting analytical snapshot in ClickHouse. Metric ownership and its returned unit are read from PostgreSQL settings."}, func(ctx context.Context, _ *mcp.CallToolRequest, input metricTotalInput) (*mcp.CallToolResult, domain.MetricTotal, error) {
+	addTool(server, allowed, &mcp.Tool{Name: "calculate_metric_total", Description: "Пересчитывает метрику по наблюдениям ClickHouse для включительного диапазона времени публикации новостей и сохраняет снимок результата в ClickHouse. Принадлежность метрики компании и единица измерения берутся из настроек PostgreSQL."}, func(ctx context.Context, _ *mcp.CallToolRequest, input metricTotalInput) (*mcp.CallToolResult, domain.MetricTotal, error) {
 		total, err := service.CalculateMetricTotal(ctx, input.MetricID, input.PeriodFrom, input.PeriodTo)
 		if err != nil {
 			return nil, domain.MetricTotal{}, err
@@ -51,7 +51,7 @@ func registerMetricTools(server *mcp.Server, allowed map[string]struct{}, servic
 		return nil, total, nil
 	})
 
-	addTool(server, allowed, &mcp.Tool{Name: "calculate_all_metric_totals", Description: "Read a company's metric rows and units from PostgreSQL, recalculate each from ClickHouse observations, persist the resulting analytical snapshots in ClickHouse, and return the catalog-ordered results."}, func(ctx context.Context, _ *mcp.CallToolRequest, input periodInput) (*mcp.CallToolResult, domain.CompanyMetricTotals, error) {
+	addTool(server, allowed, &mcp.Tool{Name: "calculate_all_metric_totals", Description: "Читает настройки и единицы измерения метрик компании из PostgreSQL, пересчитывает каждую метрику по наблюдениям ClickHouse, сохраняет аналитические снимки в ClickHouse и возвращает результаты в порядке каталога."}, func(ctx context.Context, _ *mcp.CallToolRequest, input periodInput) (*mcp.CallToolResult, domain.CompanyMetricTotals, error) {
 		totals, err := service.CalculateAllMetricTotals(ctx, input.CompanyID, input.PeriodFrom, input.PeriodTo)
 		if err != nil {
 			return nil, domain.CompanyMetricTotals{}, err

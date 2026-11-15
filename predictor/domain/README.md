@@ -1,39 +1,39 @@
-# Domain API and Worker
+# Domain API и Worker
 
-Domain contains the user-facing backend. The API handles accounts, company profiles, source links, and chat. The worker polls configured sources, extracts readable text from HTML and text-based PDFs, and forwards it to ESB. Raw material text is not persisted by Domain.
+Domain — серверная часть, с которой взаимодействует пользователь. API обслуживает учётные записи, профили компаний, ссылки на источники и чат. Фоновый обработчик опрашивает настроенные источники, извлекает читаемый текст из HTML и текстовых PDF и передаёт материалы в ESB. Domain не сохраняет исходный текст материалов.
 
-## Local development
+## Локальная разработка
 
-Copy `.env.example` to `.env` in the repository root and set the required keys. Start the dependencies and Domain services with:
+Скопируйте `.env.example` в `.env` в корне репозитория и задайте необходимые ключи. Запустите зависимости и сервисы Domain:
 
 ```sh
 docker compose --env-file .env up --build domain-api domain-worker
 ```
 
-The API listens on `http://localhost:8080`, health check is `GET /health`, and Swagger UI is `/swagger` in development.
+API доступен по адресу `http://localhost:8080`, проверка состояния — `GET /health`, Swagger UI в режиме разработки — `/swagger`.
 
-## Company profiles
+## Профили компаний
 
-Create a company with an extensible JSON profile, for example:
+Создайте компанию с расширяемым JSON-профилем, например:
 
 ```json
 {
   "profile": {
-    "name": "Example Company",
-    "industry": "Logistics",
-    "markets": ["Northern Europe", "Central Asia"],
-    "priorities": ["delivery reliability", "cost control"]
+    "name": "Пример компании",
+    "industry": "Логистика",
+    "markets": ["Северная Европа", "Центральная Азия"],
+    "priorities": ["надёжность доставки", "контроль затрат"]
   }
 }
 ```
 
-The profile schema is owned by each deployment and can evolve without a fixed dataset. Domain stores it as JSONB and sends each revision to the profile agent through ESB.
+Схему профиля определяет конкретная установка системы; фиксированный внешний набор данных не требуется. Domain хранит профиль в PostgreSQL как JSONB и отправляет каждую его версию агенту профиля через ESB.
 
-## Responsibilities
+## Обязанности Domain
 
-- User registration, login, and JWT issuance
-- One company per user, with editable JSON profile and revision checks
-- CRUD for recurring news sources and one-time material URLs
-- Background polling and extraction of HTML, RSS, Atom, sitemap, and text-based PDF materials
-- Retry-safe delivery of company profiles and extracted material to ESB
-- Chat history and analysis responses read from ESB
+- Регистрация пользователей, вход и выдача JWT.
+- Одна компания на пользователя; редактируемый JSON-профиль и контроль его версий.
+- Управление регулярными источниками новостей и разовыми ссылками на материалы.
+- Фоновый опрос источников и извлечение HTML, RSS, Atom, sitemap и текстовых PDF.
+- Повторная доставка профилей и извлечённых материалов в ESB при временных сбоях.
+- Получение истории чата и ответов аналитики из ESB.

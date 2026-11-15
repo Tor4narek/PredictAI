@@ -1,5 +1,3 @@
-# ESB unit tests
+# Модульные тесты ESB
 
-These test files are stored outside `predictor/esb`. `make test-unit` supplies
-a Go overlay so each file is compiled with its ESB package, including tests
-that exercise package-private behavior.
+Эти файлы тестов находятся за пределами `predictor/esb`. Команда `make test-unit` подключает их к пакетам ESB через Go overlay, чтобы скомпилировать и проверить каждый файл вместе с соответствующим пакетом, в том числе тесты закрытой логики пакетов.
